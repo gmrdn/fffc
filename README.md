@@ -1,40 +1,41 @@
 # Fixed File Format converter
 
-Your goal is to write a generic tool to convert fixed file format files to a csv file based on a metadata file describing its structure.
+L'objectif de cet exercice est d'écrire un outil générique qui convertira un fichier d'entrée au format fixe en un fichier csv, en se basant sur un fichier de metadonnées décrivant sa structure.
 
-Feel free to use your favorite language and libraries if needed (but no proprietary libraries, only open source), fork this project and provide your complete code as a pull request (including source and tests).
+Vous êtes libre d'utiliser n'importe quel langage ou librairie open source si vous en avez besoin.
+Créez un fork de ce projet et fournissez nous votre code complet en pull request (en incluant le code source et les tests)
 
-## Use case
+## Cas d'usage
 
-Our fixed file format files can have any number of columns
-A column can be of 3 formats:
+Notre fichier d'entrée peut avoir n'importe quel nombre de colonnes
+Une colonne peut-être d'un de ces 3 formats:
 * date (format yyyy-mm-dd)
-* numeric (decimal separator '.' ; no thousands separator ; can be negative)
+* numerique (séparateur décimal '.', peut être négatif)
 * string
 
-The structure of the file is described in a metadata file in csv format with a line for each column defining:
-* column name
-* column length
-* column type
+La structure du fichier est définie dans un fichier de métadonnées, au format csv, où chaque ligne décrit chaque colonne:
+* nom de la colonne
+* taille de la colonne
+* type de la colonne
 
-You should transform the file to a csv file (separator ',' and row separator CRLF)
+Vous devez transformer le fichier d'entrée en un fichier csv (séparateur ',' et séparateur de ligne CRLF)
 
-The dates have to be reformatted to dd/mm/yyyy
+Les dates doivent être formatés en dd/mm/yyyy
 
-The trailing spaces of string columns must be trimmed
+Les espaces en fin de chaine de caractères doivent être nettoyés (trim)
 
-The csv file must include a first line with the columns names
+La première ligne du fichier csv doit être le nom des colonnes
 
-## Example
+## Exemple
 
-Data file:
+Fichier d'entrée :
 ```
 1970-01-01John           Smith           81.5
 1975-01-31Jane           Doe             61.1
 1988-11-28Bob            Big            102.4
 ```
 
-Metadata file:
+Fichier de métadonnées :
 ```
 Birth date,10,date
 First name,15,string
@@ -42,7 +43,7 @@ Last name,15,string
 Weight,5,numeric
 ```
 
-Output file:
+Fichier csv de sortie :
 ```
 Birth date,First name,Last name,Weight
 01/01/1970,John,Smith,81.5
@@ -50,9 +51,9 @@ Birth date,First name,Last name,Weight
 28/11/1988,Bob,Big,102.4
 ```
 
-## Extra requirements
-* files are encoded in UTF-8 and may contain special characters
-* strings columns may contain separator characters like ',' and then the whole string needs to be escaped with " (double quotes). Only CR or LF are forbidden
-* in case the format of the file is not correct, the program should fail but say explicitly why
-* a fixed format file may be very big (several GB)
+## Conditions supplémentaires
+* les fichiers sont encodés en UTF-8 et peuvent contenir des caractères spéciaux
+* les colonnes au format string peuvent contenir des séparateurs ','. Dans ce cas la chaîne de caractères complète doit être protégée par des " (double quote) 
+* dans le cas où le format de fichier n'est pas correct, le programme doit échouer en expliquant la raison
+* le fichier d'entrée peut être très volumineux (plusieurs Go)
 
