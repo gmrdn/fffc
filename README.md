@@ -57,3 +57,10 @@ Birth date,First name,Last name,Weight
 * dans le cas où le format de fichier n'est pas correct, le programme doit échouer en expliquant la raison
 * le fichier d'entrée peut être très volumineux (plusieurs Go)
 
+## Que voulons nous évaluer à travers ce test ? ##
+
+La manière de résoudre le problème et l'utilisation des bonnes pratiques de craft et de clean code.
+
+## Qu'est-ce que nous n'évaluons pas ? ##
+
+Les frameworks et technologies utilisés
