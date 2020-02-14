@@ -102,9 +102,9 @@ defmodule FffcTest do
       stream = Fffc.prepare_stream_pipeline(columns, 'test_files/example_data.txt')
 
       assert Enum.take(stream, 3) == [
-               "01/01/1970,John,Smith,81.5",
-               "31/01/1975,Jane,Doe,61.1",
-               "28/11/1988,Bob,Big,102.4"
+               ["01/01/1970,John,Smith,81.5", "\n"],
+               ["31/01/1975,Jane,Doe,61.1", "\n"],
+               ["28/11/1988,Bob,Big,102.4", "\n"]
              ]
     end
 

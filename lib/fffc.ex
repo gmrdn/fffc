@@ -46,7 +46,7 @@ defmodule Fffc do
   def prepare_stream_pipeline(columns, filename) do
     File.stream!(filename)
     |> Stream.map(fn x ->
-      convert_raw_line_to_csv(columns, x)
+      [convert_raw_line_to_csv(columns, x), "\n"]
     end)
   end
 
