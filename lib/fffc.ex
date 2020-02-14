@@ -40,6 +40,19 @@ defmodule Fffc do
   end
 
   def format_value(value, "numeric") do
-    value
+    elem(Float.parse(String.trim(value)), 0)
+  end
+
+  def prepare_stream_pipeline(columns, filename) do
+    File.stream!(filename)
+    |> Stream.map(fn x ->
+      convert_raw_line_to_csv(columns, x)
+    end)
+  end
+
+  def write_stream_to_csv(stream, filename) do
+    stream
+    |> Stream.into(File.stream!(filename, [:write, :utf8]))
+    |> Stream.run()
   end
 end

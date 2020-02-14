@@ -89,6 +89,36 @@ defmodule FffcTest do
     end
   end
 
+  describe "Data parsing with a stream of lines" do
+    test "Small stream of three lines" do
+      columns =
+        Fffc.parse_meta_data([
+          "Birth date,10,date",
+          "First name,15,string",
+          "Last name,15,string",
+          "Weight,5,numeric"
+        ])
+
+      stream = Fffc.prepare_stream_pipeline(columns, 'test_files/example_data.txt')
+
+      assert Enum.take(stream, 3) == [
+               "01/01/1970,John,Smith,81.5",
+               "31/01/1975,Jane,Doe,61.1",
+               "28/11/1988,Bob,Big,102.4"
+             ]
+    end
+
+    test "Write stream to csv, small files" do
+      stream =
+        Fffc.read_csv_file('test_files/example_meta.csv')
+        |> Fffc.parse_meta_data()
+        |> Fffc.prepare_stream_pipeline('test_files/example_data.txt')
+
+      res = Fffc.write_stream_to_csv(stream, 'output/test_example.csv')
+      assert res == :ok
+    end
+  end
+
   describe "Date formatting" do
     test "Format the date as dd/mm/yyyy" do
       assert Fffc.format_value("1988-11-28", "date") == "28/11/1988"
