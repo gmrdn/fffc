@@ -62,5 +62,40 @@ defmodule FffcTest do
     end
   end
 
-  
+  describe "Data parsing with one line" do
+    test "One string column" do
+      columns = Fffc.parse_meta_data(["First name,15,string"])
+      data_row = "Guillaume      "
+      assert Fffc.convert_raw_line_to_csv(columns, data_row) == "Guillaume"
+    end
+
+    test "Two string columns" do
+      columns = Fffc.parse_meta_data(["First name,15,string", "Last name,15,string"])
+      data_row = "Guillaume      Rondon         "
+      assert Fffc.convert_raw_line_to_csv(columns, data_row) == "Guillaume,Rondon"
+    end
+
+    test "Date, string and numeric, all valid" do
+      columns =
+        Fffc.parse_meta_data([
+          "Birth date,10,date",
+          "First name,15,string",
+          "Last name,15,string",
+          "Weight,5,numeric"
+        ])
+
+      data_row = "1988-11-28Bob            Big            102.4"
+      assert Fffc.convert_raw_line_to_csv(columns, data_row) == "28/11/1988,Bob,Big,102.4"
+    end
+  end
+
+  describe "Date formatting" do
+    test "Format the date as dd/mm/yyyy" do
+      assert Fffc.format_value("1988-11-28", "date") == "28/11/1988"
+    end
+
+    test "Format the date as dd/mm/yyyy, adding zeros when necessary" do
+      assert Fffc.format_value("1970-01-01", "date") == "01/01/1970"
+    end
+  end
 end
