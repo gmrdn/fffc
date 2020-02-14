@@ -1,4 +1,10 @@
 defmodule Fffc do
+
+  def read_csv_file(filename) do
+    File.read!(filename)
+    |> String.split("\n")
+  end
+
   def parse_meta_data(meta) do
     Enum.map_reduce(meta, 0, fn x, acc ->
       line = String.split(x, ",")
@@ -11,4 +17,5 @@ defmodule Fffc do
        ], acc + String.to_integer(Enum.at(line, 1))}
     end)
   end
+
 end
