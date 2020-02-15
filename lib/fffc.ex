@@ -59,6 +59,7 @@ defmodule Fffc do
   end
 
   def write_stream_to_csv(headers, stream, filename) do
+    File.mkdir('output')
     File.write!(filename, headers <> "\n")
 
     stream
