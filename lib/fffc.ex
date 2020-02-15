@@ -17,6 +17,14 @@ defmodule Fffc do
     end)
   end
 
+  def get_csv_headers(columns) do
+    elem(columns, 0)
+    |> Enum.map(fn x ->
+      Keyword.get(x, :name)
+    end)
+    |> Enum.join(",")
+  end
+
   def convert_raw_line_to_csv(columns, line) do
     elem(columns, 0)
     |> Enum.map(fn x ->
@@ -50,9 +58,11 @@ defmodule Fffc do
     end)
   end
 
-  def write_stream_to_csv(stream, filename) do
+  def write_stream_to_csv(headers, stream, filename) do
+    File.write!(filename, headers <> "\n")
+
     stream
-    |> Stream.into(File.stream!(filename, [:write, :utf8]))
+    |> Stream.into(File.stream!(filename, [:append, :utf8]))
     |> Stream.run()
   end
 end

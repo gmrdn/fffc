@@ -3,7 +3,7 @@ defmodule FffcTest do
   doctest Fffc
 
   describe "Meta data parsing" do
-    test "Converts a line of metadata (csv format) to a list of keywords and values" do
+    test "Should convert a line of metadata (csv format) to a list of keywords and values" do
       meta = ["Birth date,10,date"]
       columns = elem(Fffc.parse_meta_data(meta), 0)
       assert Enum.at(columns, 0) |> Keyword.get(:name) == "Birth date"
@@ -11,7 +11,7 @@ defmodule FffcTest do
       assert Enum.at(columns, 0) |> Keyword.get(:type) == "date"
     end
 
-    test "Converts all lines of metada (csv format) to a list of columns with keywords and values" do
+    test "Should convert all lines of metada (csv format) to a list of columns with keywords and values" do
       meta = [
         "Birth date,10,date",
         "First name,15,string",
@@ -25,7 +25,7 @@ defmodule FffcTest do
       assert Enum.at(columns, 3) |> Keyword.get(:type) == "numeric"
     end
 
-    test "Adds all columns length and returns the total length" do
+    test "Should add all columns length and returns the total length" do
       meta = [
         "Col1,1,string",
         "Col2,2,string"
@@ -35,7 +35,7 @@ defmodule FffcTest do
       assert columns_length == 3
     end
 
-    test "Adds the begining and ending position (range) of the column in the line" do
+    test "Should add the begining and ending position (range) of the column in the line" do
       meta = [
         "Birth date,10,date",
         "First name,15,string",
@@ -50,7 +50,7 @@ defmodule FffcTest do
       assert Enum.at(columns, 3) |> Keyword.get(:range) == 40..44
     end
 
-    test "Can read meta data from csv file" do
+    test "Should read meta data from csv file" do
       meta = Fffc.read_csv_file('test_files/example_meta.csv')
 
       assert meta == [
@@ -60,22 +60,34 @@ defmodule FffcTest do
                "Weight,5,numeric"
              ]
     end
+
+    test "Should format columns names as csv headers" do
+      columns =
+        Fffc.parse_meta_data([
+          "Birth date,10,date",
+          "First name,15,string",
+          "Last name,15,string",
+          "Weight,5,numeric"
+        ])
+
+      assert Fffc.get_csv_headers(columns) == "Birth date,First name,Last name,Weight"
+    end
   end
 
   describe "Data parsing with one line" do
-    test "One string column" do
+    test "Should parse data with one string column" do
       columns = Fffc.parse_meta_data(["First name,15,string"])
       data_row = "Guillaume      "
       assert Fffc.convert_raw_line_to_csv(columns, data_row) == "Guillaume"
     end
 
-    test "Two string columns" do
+    test "Should parse data with two string columns" do
       columns = Fffc.parse_meta_data(["First name,15,string", "Last name,15,string"])
       data_row = "Guillaume      Rondon         "
       assert Fffc.convert_raw_line_to_csv(columns, data_row) == "Guillaume,Rondon"
     end
 
-    test "Date, string and numeric, all valid" do
+    test "Should parse data with Date, string and numeric, all valid" do
       columns =
         Fffc.parse_meta_data([
           "Birth date,10,date",
@@ -90,7 +102,7 @@ defmodule FffcTest do
   end
 
   describe "Data parsing with a stream of lines" do
-    test "Small stream of three lines" do
+    test "Should prepare a small stream of three lines" do
       columns =
         Fffc.parse_meta_data([
           "Birth date,10,date",
@@ -108,23 +120,31 @@ defmodule FffcTest do
              ]
     end
 
-    test "Write stream to csv, small files" do
-      stream =
-        Fffc.read_csv_file('test_files/example_meta.csv')
-        |> Fffc.parse_meta_data()
-        |> Fffc.prepare_stream_pipeline('test_files/example_data.txt')
+    test "Should write stream to csv, small file" do
+      columns = Fffc.parse_meta_data(Fffc.read_csv_file('test_files/example_meta.csv'))
+      headers = Fffc.get_csv_headers(columns)
+      stream = Fffc.prepare_stream_pipeline(columns, 'test_files/example_data.txt')
+      result = Fffc.write_stream_to_csv(headers, stream, 'output/test_example.csv')
+      assert result == :ok
+    end
 
-      res = Fffc.write_stream_to_csv(stream, 'output/test_example.csv')
-      assert res == :ok
+    test "Should include column names first" do
+      columns = Fffc.parse_meta_data(Fffc.read_csv_file('test_files/example_meta.csv'))
+      headers = Fffc.get_csv_headers(columns)
+      stream = Fffc.prepare_stream_pipeline(columns, 'test_files/example_data.txt')
+      Fffc.write_stream_to_csv(headers, stream, 'output/test_example.csv')
+
+      assert File.read!('output/test_example.csv') |> String.split("\n") |> List.first() ==
+               "Birth date,First name,Last name,Weight"
     end
   end
 
   describe "Date formatting" do
-    test "Format the date as dd/mm/yyyy" do
+    test "Should format the date as dd/mm/yyyy" do
       assert Fffc.format_value("1988-11-28", "date") == "28/11/1988"
     end
 
-    test "Format the date as dd/mm/yyyy, adding zeros when necessary" do
+    test "Should format the date as dd/mm/yyyy, adding zeros when necessary" do
       assert Fffc.format_value("1970-01-01", "date") == "01/01/1970"
     end
   end
