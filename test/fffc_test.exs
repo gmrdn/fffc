@@ -99,6 +99,22 @@ defmodule FffcTest do
       data_row = "1988-11-28Bob            Big            102.4"
       assert Fffc.convert_raw_line_to_csv(columns, data_row) == "28/11/1988,Bob,Big,102.4"
     end
+
+    test "Should parse data with special characters" do
+      columns = Fffc.parse_meta_data(["First name,32,string"])
+      data_row = " !#$%&'()*+-./:;<=>?@[\\]^_`{|}~"
+
+      assert Fffc.convert_raw_line_to_csv(columns, data_row) ==
+               "!#$%&'()*+-./:;<=>?@[\\]^_`{|}~"
+    end
+
+    test "Should add double quotes when a value contains a coma" do
+      columns = Fffc.parse_meta_data(["First name,7,string"])
+      data_row = "Aaa,bbb"
+
+      assert Fffc.convert_raw_line_to_csv(columns, data_row) ==
+               "\"Aaa,bbb\""
+    end
   end
 
   describe "Data parsing with a stream of lines" do
@@ -137,6 +153,14 @@ defmodule FffcTest do
       assert File.read!('output/test_example.csv') |> String.split("\n") |> List.first() ==
                "Birth date,First name,Last name,Weight"
     end
+
+    test "Should write stream to csv, special characters" do
+      columns = Fffc.parse_meta_data(Fffc.read_csv_file('test_files/special_chars_meta.csv'))
+      headers = Fffc.get_csv_headers(columns)
+      stream = Fffc.prepare_stream_pipeline(columns, 'test_files/special_chars_data.txt')
+      result = Fffc.write_stream_to_csv(headers, stream, 'output/test_special_chars.csv')
+      assert result == :ok
+    end
   end
 
   describe "Date formatting" do
@@ -146,6 +170,18 @@ defmodule FffcTest do
 
     test "Should format the date as dd/mm/yyyy, adding zeros when necessary" do
       assert Fffc.format_value("1970-01-01", "date") == "01/01/1970"
+    end
+
+    test "Should raise an error when the date format is incorrect" do
+      assert_raise ArgumentError, "cannot parse \"abc\" as date, reason: :invalid_format", fn ->
+        Fffc.format_value("abc", "date")
+      end
+    end
+
+    test "Should raise an error when the date is empty" do
+      assert_raise ArgumentError, "cannot parse \"\" as date, reason: :invalid_format", fn ->
+        Fffc.format_value("", "date")
+      end
     end
   end
 end

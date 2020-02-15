@@ -35,11 +35,15 @@ defmodule Fffc do
   end
 
   def format_value(value, "string") do
-    String.trim(value)
+    if String.contains?(value, ",") do
+      String.trim("\"" <> String.replace(value, "\"", "\"\"") <> "\"")
+    else
+      String.trim(String.replace(value, "\"", "\"\""))
+    end
   end
 
   def format_value(value, "date") do
-    date = elem(Date.from_iso8601(value), 1)
+    date = Date.from_iso8601!(value)
 
     [date.day, date.month, date.year]
     |> Enum.map(fn x -> to_string(x) end)
