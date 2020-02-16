@@ -35,11 +35,13 @@ defmodule Fffc do
   end
 
   def format_value(value, "string") do
-    if String.contains?(value, ",") do
-      String.trim("\"" <> String.replace(value, "\"", "\"\"") <> "\"")
-    else
-      String.trim(String.replace(value, "\"", "\"\""))
-    end
+    formatted =
+      String.trim(value)
+      |> String.replace("\"", "\"\"")
+
+    if String.contains?(formatted, ","),
+      do: Enum.join(["\"", formatted, "\""]),
+      else: formatted
   end
 
   def format_value(value, "date") do

@@ -115,6 +115,14 @@ defmodule FffcTest do
       assert Fffc.convert_raw_line_to_csv(columns, data_row) ==
                "\"Aaa,bbb\""
     end
+
+    test "Should add double quotes when a value contains a coma and double all double quotes inside the string" do
+      columns = Fffc.parse_meta_data(["First name,7,string"])
+      data_row = "A\"a,b\"b"
+
+      assert Fffc.convert_raw_line_to_csv(columns, data_row) ==
+               "\"A\"\"a,b\"\"b\""
+    end
   end
 
   describe "Data parsing with a stream of lines" do
