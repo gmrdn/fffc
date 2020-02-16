@@ -26,6 +26,16 @@ defmodule Fffc do
   end
 
   def convert_raw_line_to_csv(columns, line) do
+    line_length = String.length(String.replace(line, "\n", ""))
+    columns_length = elem(columns, 1)
+
+    if columns_length != line_length do
+      raise ArgumentError,
+            "incorrect line's length: expected " <>
+              Integer.to_string(columns_length) <>
+              " received : " <> Integer.to_string(line_length)
+    end
+
     elem(columns, 0)
     |> Enum.map(fn x ->
       String.slice(line, Keyword.get(x, :range))

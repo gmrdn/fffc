@@ -101,7 +101,7 @@ defmodule FffcTest do
     end
 
     test "Should parse data with special characters" do
-      columns = Fffc.parse_meta_data(["First name,32,string"])
+      columns = Fffc.parse_meta_data(["First name,31,string"])
       data_row = " !#$%&'()*+-./:;<=>?@[\\]^_`{|}~"
 
       assert Fffc.convert_raw_line_to_csv(columns, data_row) ==
@@ -122,6 +122,17 @@ defmodule FffcTest do
 
       assert Fffc.convert_raw_line_to_csv(columns, data_row) ==
                "\"A\"\"a,b\"\"b\""
+    end
+
+    test "Should exit the program if a line of data has an incorrect length" do
+      columns = Fffc.parse_meta_data(["First name,15,string", "Last name,15,string"])
+      data_row = "Guillaume                   Rondon                     "
+
+      assert_raise ArgumentError,
+                   "incorrect line's length: expected 30 received : 55",
+                   fn ->
+                     Fffc.convert_raw_line_to_csv(columns, data_row)
+                   end
     end
   end
 
