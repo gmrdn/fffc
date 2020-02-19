@@ -203,4 +203,30 @@ defmodule FffcTest do
       end
     end
   end
+
+  describe "Numeric values" do
+    test "Should accept negative values" do
+      assert Fffc.format_value("-1.0", "numeric") == -1.0
+    end
+
+    test "Should add a dot and a zero when no decimal is provided" do
+      assert Fffc.format_value("1", "numeric") == 1.0
+    end
+
+    test "Should fail if the decimal separator is not a dot" do
+      assert_raise ArgumentError, "cannot parse 1,0 as numeric, reason: :invalid_format", fn ->
+        Fffc.format_value("1,0", "numeric")
+      end
+    end
+
+    test "Should fail if the value is not a number" do
+      assert_raise ArgumentError, "cannot parse abc as numeric, reason: :invalid_format", fn ->
+        Fffc.format_value("abc", "numeric")
+      end
+    end
+
+    test "Should accept values with lots of digits" do
+      assert Fffc.format_value("-1234567890.01234567890", "numeric") == -1_234_567_890.01234567890
+    end
+  end
 end

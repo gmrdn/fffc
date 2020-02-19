@@ -64,7 +64,13 @@ defmodule Fffc do
   end
 
   def format_value(value, "numeric") do
-    elem(Float.parse(String.trim(value)), 0)
+    case Float.parse(String.trim(value)) do
+      {num, ""} ->
+        num
+
+      _ ->
+        raise(ArgumentError, "cannot parse " <> value <> " as numeric, reason: :invalid_format")
+    end
   end
 
   def prepare_stream_pipeline(columns, filename) do
